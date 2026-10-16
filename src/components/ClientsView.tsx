@@ -193,7 +193,7 @@ export const ClientsView: React.FC<ClientsViewProps> = ({
                   <div className="flex flex-col items-end gap-1">
                     {isBlacklisted && (
                       <span className="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-red-900/80 text-red-200 border border-red-600 flex items-center gap-1">
-                        <ShieldAlert className="w-3 h-3 text-red-400" /> Barrado
+                        <ShieldAlert className="w-3 h-3 text-red-400" /> BlackList Ativa
                       </span>
                     )}
 

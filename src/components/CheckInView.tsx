@@ -172,30 +172,6 @@ export const CheckInView: React.FC<CheckInViewProps> = ({
     }
   };
 
-  // Quick 1-click test simulation
-  const applyQuickDemo = (type: 'valid' | 'blacklisted' | 'vip') => {
-    sound.playClick();
-    if (type === 'valid') {
-      const doc = '234.567.890-12';
-      setDocumentInput(doc);
-      setNameInput('Camila Mendonça Rocha');
-      setIsVip(false);
-      verifyDocument(doc);
-    } else if (type === 'vip') {
-      const doc = '123.456.789-00';
-      setDocumentInput(doc);
-      setNameInput('Rodrigo Silva Alcantara');
-      setIsVip(true);
-      verifyDocument(doc);
-    } else {
-      const doc = '111.222.333-44';
-      setDocumentInput(doc);
-      setNameInput('Marcos Vinicius Santos');
-      setIsVip(false);
-      verifyDocument(doc);
-    }
-  };
-
   // Submit Fast Check-in
   const handleFastCheckIn = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
@@ -315,7 +291,7 @@ export const CheckInView: React.FC<CheckInViewProps> = ({
 
         <div className="flex items-center gap-3">
           <div className="px-3 py-1 rounded-xl bg-purple-950/60 border border-purple-500/30 text-xs text-purple-200">
-            Dentro agora: <strong className="text-white font-mono text-sm">{insideCount}</strong>
+            Público Presente: <strong className="text-white font-mono text-sm">{insideCount}</strong>
           </div>
 
           {parties.length > 1 && (
@@ -463,34 +439,6 @@ export const CheckInView: React.FC<CheckInViewProps> = ({
             <Camera className="w-4 h-4" />
             <span>TIRAR FOTO DO DOCUMENTO (OCR)</span>
           </button>
-
-          {/* 1-Click Fast Simulators */}
-          <div className="mt-2.5 pt-2.5 border-t border-white/10 flex items-center justify-between gap-1">
-            <span className="text-[10px] text-slate-400 font-bold uppercase">Simular:</span>
-            <div className="flex gap-1.5">
-              <button
-                type="button"
-                onClick={() => applyQuickDemo('valid')}
-                className="px-2.5 py-1 rounded-lg bg-emerald-950/60 hover:bg-emerald-900 text-emerald-300 text-[11px] font-bold border border-emerald-800/40"
-              >
-                CNH Normal
-              </button>
-              <button
-                type="button"
-                onClick={() => applyQuickDemo('vip')}
-                className="px-2.5 py-1 rounded-lg bg-amber-950/60 hover:bg-amber-900 text-amber-300 text-[11px] font-bold border border-amber-800/40"
-              >
-                VIP
-              </button>
-              <button
-                type="button"
-                onClick={() => applyQuickDemo('blacklisted')}
-                className="px-2.5 py-1 rounded-lg bg-red-950/60 hover:bg-red-900 text-red-300 text-[11px] font-bold border border-red-800/40"
-              >
-                Barrado
-              </button>
-            </div>
-          </div>
         </div>
 
         {/* Right Column: Direct Fast Entry Form (7 cols) */}

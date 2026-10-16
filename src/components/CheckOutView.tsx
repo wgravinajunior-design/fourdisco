@@ -79,16 +79,16 @@ export const CheckOutView: React.FC<CheckOutViewProps> = ({
               <span className="text-2xl font-black text-white font-mono">
                 {activeRecords.length}
               </span>
-              <span className="text-xs text-slate-400">clientes no interior</span>
+              <span className="text-xs text-slate-400">Público Presente no Local</span>
             </div>
           </div>
         </div>
 
         <div className="text-right">
-          <span className="text-[10px] font-semibold text-slate-400 block">Status da Porta</span>
+          <span className="text-[10px] font-semibold text-slate-400 block">Status da Portaria</span>
           <span className="text-xs font-bold text-emerald-400 flex items-center gap-1 justify-end">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-            Catraca Liberada
+            Terminal Operacional
           </span>
         </div>
       </div>
@@ -120,11 +120,11 @@ export const CheckOutView: React.FC<CheckOutViewProps> = ({
       {filtered.length === 0 ? (
         <div className="glass-panel p-8 rounded-3xl border border-white/10 text-center">
           <AlertCircle className="w-10 h-10 text-slate-500 mx-auto mb-2" />
-          <h4 className="text-sm font-bold text-slate-300">Nenhum cliente encontrado</h4>
+          <h4 className="text-sm font-bold text-slate-300">Nenhum cliente presente no momento</h4>
           <p className="text-xs text-slate-500 mt-0.5">
             {searchTerm
-              ? 'Nenhum registro com esses dados ativo dentro da boate.'
-              : 'Nenhum cliente dentro do clube no momento.'}
+              ? 'Nenhum registro ativo encontrado com esses dados.'
+              : 'Não há clientes registrados no interior do estabelecimento no momento.'}
           </p>
         </div>
       ) : (

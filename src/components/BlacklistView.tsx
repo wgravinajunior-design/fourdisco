@@ -325,7 +325,7 @@ export const BlacklistView: React.FC<BlacklistViewProps> = ({
                 <input
                   type="text"
                   required
-                  placeholder="Nome do indivíduo a ser barrado"
+                  placeholder="Nome do indivíduo a ser inserido na BlackList"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   className="w-full bg-[#1f0e15] border border-red-900/50 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-red-500"

@@ -95,31 +95,12 @@ CREATE TABLE IF NOT EXISTS `checkins` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ================================================================
--- DADOS INICIAIS DE DEMONSTRAÇÃO (SEED)
+-- DADOS BÁSICOS DE ACESSO INICIAL
 -- ================================================================
 
--- Usuários padrões
+-- Usuários operacionais padrão
 INSERT INTO `users` (`username`, `password`, `name`, `role`) VALUES
 ('operador', '123456', 'Portaria Principal', 'operator'),
 ('admin', 'admin123', 'Gerência Geral', 'admin')
 ON DUPLICATE KEY UPDATE `name`=VALUES(`name`);
 
--- Festa de hoje (usando CURDATE())
-INSERT INTO `parties` (`id`, `name`, `date`, `description`, `theme_color`, `max_capacity`, `status`) VALUES
-('party-today-1', 'FourDisco Neon Glow - Sexta Premium', CURDATE(), 'Noite eletrônica especial com DJs internacionais e pista open air', '#8b5cf6', 600, 'active'),
-('party-today-2', 'FourDisco Sunset Lounge', CURDATE(), 'Área VIP rooftop com sunset lounge e drinks exclusivos', '#ec4899', 250, 'active')
-ON DUPLICATE KEY UPDATE `status`='active';
-
--- Clientes cadastrados para teste
-INSERT INTO `clients` (`id`, `name`, `document`, `document_type`, `phone`, `email`, `is_vip`, `total_visits`) VALUES
-('cli-1', 'Rodrigo Silva Alcantara', '123.456.789-00', 'CPF', '(11) 98765-4321', 'rodrigo@email.com', TRUE, 12),
-('cli-2', 'Beatriz Ferreira Lima', '987.654.321-11', 'CPF', '(11) 97654-3210', 'beatriz@email.com', FALSE, 4),
-('cli-3', 'Lucas Gabriel Oliveira', '456.789.012-33', 'CPF', '(21) 99887-1122', 'lucas@email.com', FALSE, 1),
-('cli-4', 'Marcos Vinicius Santos (Bloqueado)', '111.222.333-44', 'CPF', '(11) 91122-3344', 'marcos@email.com', FALSE, 2)
-ON DUPLICATE KEY UPDATE `name`=VALUES(`name`);
-
--- Registro de Blacklist para teste (exemplo de indivíduo barrado)
-INSERT INTO `blacklist` (`id`, `client_id`, `document`, `name`, `reason`, `ban_type`, `start_date`, `end_date`, `added_by`, `status`) VALUES
-('bl-1', 'cli-4', '111.222.333-44', 'Marcos Vinicius Santos (Bloqueado)', 'Envolvimento em tumulto na pista de dança e desacato aos seguranças', 'indefinite', CURDATE(), NULL, 'Gerência de Segurança', 'active'),
-('bl-2', NULL, '555.666.777-88', 'Fernando Souza Mendes', 'Tentativa de utilizar documento falso de terceiro', 'period', CURDATE(), DATE_ADD(CURDATE(), INTERVAL 6 MONTH), 'Coordenação FourDisco', 'active')
-ON DUPLICATE KEY UPDATE `reason`=VALUES(`reason`);

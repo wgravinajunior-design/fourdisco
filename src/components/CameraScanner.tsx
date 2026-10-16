@@ -431,8 +431,8 @@ export const CameraScanner: React.FC<CameraScannerProps> = ({
           >
             <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
             <div className="truncate">
-              <div>Simular Barrado</div>
-              <div className="text-[10px] text-rose-400/80 font-normal">Marcos (Blacklist)</div>
+              <div>Simular BlackList Ativa</div>
+              <div className="text-[10px] text-rose-400/80 font-normal">Identificação Blacklist</div>
             </div>
           </button>
         </div>
