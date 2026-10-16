@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { User, Party, Client, BlacklistEntry } from '@/types';
-import { store, getTodayString } from '@/lib/storage';
+import { User, Party, Client, BlacklistEntry, AuditLog } from '@/types';
+import { store } from '@/lib/storage';
 import { Header } from '@/components/Header';
 import { LoginView } from '@/components/LoginView';
 import { CheckInView } from '@/components/CheckInView';
@@ -10,6 +10,8 @@ import { CheckOutView } from '@/components/CheckOutView';
 import { ClientsView } from '@/components/ClientsView';
 import { PartiesView } from '@/components/PartiesView';
 import { BlacklistView } from '@/components/BlacklistView';
+import { UsersView } from '@/components/UsersView';
+import { AuditView } from '@/components/AuditView';
 
 export default function Home() {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
@@ -20,6 +22,7 @@ export default function Home() {
   const [selectedPartyIds, setSelectedPartyIds] = useState<string[]>([]);
   const [clients, setClients] = useState<Client[]>([]);
   const [blacklist, setBlacklist] = useState<BlacklistEntry[]>([]);
+  const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
   const [insideCount, setInsideCount] = useState<number>(0);
 
   // Client to prefill into blacklist modal
@@ -36,6 +39,9 @@ export default function Home() {
     const bl = store.getBlacklist();
     setBlacklist(bl);
 
+    const logs = store.getAuditLogs();
+    setAuditLogs(logs);
+
     const inside = store.getActiveInside().length;
     setInsideCount(inside);
 
@@ -49,7 +55,7 @@ export default function Home() {
     const savedUser = store.getCurrentUser();
     if (savedUser) {
       setCurrentUser(savedUser);
-      if (savedUser.role === 'admin') {
+      if (savedUser.role === 'administrador') {
         setActiveTab('clients');
       } else {
         setActiveTab('checkin');
@@ -58,7 +64,7 @@ export default function Home() {
     refreshData();
   }, [refreshData]);
 
-  // Handle Login: auto-detect party of the day
+  // Handle Login: auto-detect party of the day & route according to role
   const handleLogin = (user: User) => {
     store.setCurrentUser(user);
     setCurrentUser(user);
@@ -66,16 +72,15 @@ export default function Home() {
     // Auto-detect party of the day
     const todayParties = store.getTodayParties();
     if (todayParties.length > 0) {
-      // Auto select the first or all today's parties
       const todayIds = todayParties.map((tp) => tp.id);
       store.setSelectedPartyIds(todayIds);
       setSelectedPartyIds(todayIds);
     }
 
-    if (user.role === 'admin') {
-      setActiveTab('clients'); // Opens site with client database directly
+    if (user.role === 'administrador') {
+      setActiveTab('clients'); // Admin sees everything, starts at dashboard
     } else {
-      setActiveTab('checkin'); // Gatekeeper mode
+      setActiveTab('checkin'); // Portaria only sees gatekeeper portaria!
     }
     refreshData();
   };
@@ -89,7 +94,6 @@ export default function Home() {
     let updated: string[];
     if (selectedPartyIds.includes(partyId)) {
       if (selectedPartyIds.length === 1) {
-        // Keep at least one selected
         return;
       }
       updated = selectedPartyIds.filter((id) => id !== partyId);
@@ -109,13 +113,18 @@ export default function Home() {
     return <LoginView onLogin={handleLogin} />;
   }
 
+  const isAdmin = currentUser.role === 'administrador';
+
+  // Strict role enforcement: If portaria user attempts to access any admin tab, keep on checkin
+  const effectiveTab = !isAdmin && activeTab !== 'checkin' && activeTab !== 'checkout' ? 'checkin' : activeTab;
+
   return (
     <div className="min-h-screen flex flex-col bg-[#08080d]">
       {/* Top Header */}
       <Header
         currentUser={currentUser}
         onLogout={handleLogout}
-        activeTab={activeTab}
+        activeTab={effectiveTab}
         setActiveTab={setActiveTab}
         parties={parties}
         selectedPartyIds={selectedPartyIds}
@@ -125,7 +134,7 @@ export default function Home() {
 
       {/* Main Content View */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-        {activeTab === 'checkin' && (
+        {effectiveTab === 'checkin' && (
           <CheckInView
             currentUser={currentUser}
             parties={parties}
@@ -134,11 +143,12 @@ export default function Home() {
           />
         )}
 
-        {activeTab === 'checkout' && (
+        {effectiveTab === 'checkout' && (
           <CheckOutView parties={parties} onCheckOutCompleted={refreshData} />
         )}
 
-        {activeTab === 'clients' && currentUser.role === 'admin' && (
+        {/* Administrador Exclusive Sections */}
+        {isAdmin && effectiveTab === 'clients' && (
           <ClientsView
             clients={clients}
             onClientsUpdated={refreshData}
@@ -146,7 +156,7 @@ export default function Home() {
           />
         )}
 
-        {activeTab === 'parties' && currentUser.role === 'admin' && (
+        {isAdmin && effectiveTab === 'parties' && (
           <PartiesView
             parties={parties}
             selectedPartyIds={selectedPartyIds}
@@ -155,7 +165,7 @@ export default function Home() {
           />
         )}
 
-        {activeTab === 'blacklist' && currentUser.role === 'admin' && (
+        {isAdmin && effectiveTab === 'blacklist' && (
           <BlacklistView
             blacklist={blacklist}
             onBlacklistUpdated={refreshData}
@@ -163,16 +173,27 @@ export default function Home() {
             onClearPrefill={() => setBlacklistPrefillClient(null)}
           />
         )}
+
+        {isAdmin && effectiveTab === 'users' && (
+          <UsersView
+            currentUser={currentUser}
+            onUsersUpdated={refreshData}
+          />
+        )}
+
+        {isAdmin && effectiveTab === 'audit' && (
+          <AuditView logs={auditLogs} />
+        )}
       </main>
 
       {/* Footer */}
       <footer className="w-full py-4 px-6 border-t border-white/5 text-center text-xs text-slate-500">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
           <span>
-            FourDisco Nightclub OS • FourDisco 2026 • Sistema de Portaria e Biometria
+            FourDisco Nightclub OS • FourDisco 2026 • Portaria com Auditoria Ativa
           </span>
           <span className="text-slate-600">
-            MySQL 8.0 Conectado • Pronto para Vercel
+            Perfil: <strong className="text-slate-400 uppercase font-mono">{currentUser.role}</strong> ({currentUser.username})
           </span>
         </div>
       </footer>

@@ -3,13 +3,13 @@
 import React, { useState } from 'react';
 import { User, UserRole } from '@/types';
 import { sound } from '@/lib/audio';
+import { store } from '@/lib/storage';
 import {
   Sparkles,
   Lock,
   ArrowRight,
   ShieldCheck,
   Building2,
-  CheckCircle,
   KeyRound,
 } from 'lucide-react';
 
@@ -20,7 +20,7 @@ interface LoginViewProps {
 export const LoginView: React.FC<LoginViewProps> = ({ onLogin }) => {
   const [username, setUsername] = useState('GOUP');
   const [password, setPassword] = useState('GOUP226457');
-  const [selectedRole, setSelectedRole] = useState<UserRole>('admin');
+  const [selectedRole, setSelectedRole] = useState<UserRole>('administrador');
   const [error, setError] = useState('');
 
   const handleLoginSubmit = (e?: React.FormEvent) => {
@@ -29,42 +29,30 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLogin }) => {
     const u = username.trim().toUpperCase();
     const p = password.trim();
 
-    if (u === 'GOUP' && p === 'GOUP226457') {
+    // Authenticate through store (checks registered users + master GOUP)
+    const authenticated = store.authenticate(u, p);
+    if (authenticated) {
       sound.playSuccess();
-      onLogin({
-        id: 'usr-goup',
-        username: 'GOUP',
-        name: selectedRole === 'admin' ? 'Administrador FourDisco (GOUP)' : 'Portaria FourDisco (GOUP)',
-        role: selectedRole,
-      });
-      return;
-    }
-
-    // Fallback for custom credentials if needed
-    if (u.length > 0 && p.length > 0) {
-      sound.playSuccess();
-      const isAdmin = u.includes('ADMIN') || u.includes('GERENTE') || selectedRole === 'admin';
-      onLogin({
-        id: `usr-${Date.now()}`,
-        username: u,
-        name: u,
-        role: isAdmin ? 'admin' : 'operator',
-      });
+      onLogin(authenticated);
       return;
     }
 
     sound.playAlertBuzzer();
-    setError('Credenciais inválidas. Usuário padrão: GOUP / Senha: GOUP226457');
+    setError('Credenciais incorretas! Usuário padrão: GOUP / Senha: GOUP226457');
   };
 
   const handleInstantLogin = (role: UserRole) => {
     sound.playSuccess();
-    onLogin({
+    const user = store.authenticate('GOUP', 'GOUP226457') || {
       id: 'usr-goup',
       username: 'GOUP',
-      name: role === 'admin' ? 'Administrador FourDisco (GOUP)' : 'Portaria FourDisco (GOUP)',
+      password: 'GOUP226457',
+      name: role === 'administrador' ? 'Administrador FourDisco' : 'Portaria FourDisco',
       role: role,
-    });
+    };
+    // Ensure role matches requested instant view
+    user.role = role;
+    onLogin(user);
   };
 
   return (
@@ -86,7 +74,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLogin }) => {
             FOURDISCO
           </h1>
           <p className="text-xs text-slate-400 mt-1 font-medium">
-            Sistema Oficial de Portaria, Check-in & Gestão VIP
+            Sistema Oficial de Portaria, Check-in & Auditoria Geral
           </p>
         </div>
 
@@ -96,11 +84,11 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLogin }) => {
             <div className="flex items-center gap-2">
               <KeyRound className="w-4 h-4 text-purple-400" />
               <span className="text-xs font-black uppercase tracking-wider text-slate-200">
-                Acesso do Sistema
+                Acesso Seguro
               </span>
             </div>
             <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-700/60 font-bold">
-              GOUP AUTH
+              PORTARIA & ADMIN
             </span>
           </div>
 
@@ -135,36 +123,36 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLogin }) => {
               />
             </div>
 
-            {/* Terminal / Role Selector */}
+            {/* Perfil Inicial Selector */}
             <div>
               <label className="block text-[11px] font-bold text-slate-400 mb-1.5 uppercase">
-                Ambiente Inicial:
+                Perfil de Acesso:
               </label>
               <div className="grid grid-cols-2 gap-2">
                 <button
                   type="button"
-                  onClick={() => setSelectedRole('admin')}
+                  onClick={() => setSelectedRole('administrador')}
                   className={`py-2 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all border ${
-                    selectedRole === 'admin'
+                    selectedRole === 'administrador'
                       ? 'bg-amber-500/20 text-amber-300 border-amber-500 shadow-md'
                       : 'bg-white/5 text-slate-400 border-transparent hover:text-white'
                   }`}
                 >
                   <ShieldCheck className="w-3.5 h-3.5" />
-                  <span>Gerência / Cadastros</span>
+                  <span>Administrador (Tudo)</span>
                 </button>
 
                 <button
                   type="button"
-                  onClick={() => setSelectedRole('operator')}
+                  onClick={() => setSelectedRole('portaria')}
                   className={`py-2 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all border ${
-                    selectedRole === 'operator'
+                    selectedRole === 'portaria'
                       ? 'bg-purple-600/30 text-purple-300 border-purple-500 shadow-md'
                       : 'bg-white/5 text-slate-400 border-transparent hover:text-white'
                   }`}
                 >
                   <Building2 className="w-3.5 h-3.5" />
-                  <span>Portaria Rápida</span>
+                  <span>Portaria (Só Portaria)</span>
                 </button>
               </div>
             </div>
@@ -189,18 +177,18 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLogin }) => {
             <div className="grid grid-cols-2 gap-2">
               <button
                 type="button"
-                onClick={() => handleInstantLogin('admin')}
+                onClick={() => handleInstantLogin('administrador')}
                 className="py-2 px-3 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-300 text-[11px] font-bold text-center transition-all"
               >
-                Abrir Cadastros / Site
+                Entrar como Admin
               </button>
 
               <button
                 type="button"
-                onClick={() => handleInstantLogin('operator')}
+                onClick={() => handleInstantLogin('portaria')}
                 className="py-2 px-3 rounded-xl bg-purple-950/50 hover:bg-purple-900/60 border border-purple-500/30 text-purple-300 text-[11px] font-bold text-center transition-all"
               >
-                Abrir Portaria Rápida
+                Entrar como Portaria
               </button>
             </div>
           </div>

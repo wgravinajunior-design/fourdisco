@@ -1,10 +1,14 @@
-export type UserRole = 'operator' | 'admin';
+export type UserRole = 'portaria' | 'administrador';
 
 export interface User {
   id: string;
   username: string;
+  password?: string;
   name: string;
   role: UserRole;
+  active?: boolean;
+  createdAt?: string;
+  lastLogin?: string;
 }
 
 export interface Party {
@@ -79,4 +83,34 @@ export interface BlacklistCheckResult {
   reason?: string;
   banType?: BanType;
   endDate?: string;
+}
+
+export type AuditAction =
+  | 'LOGIN'
+  | 'LOGOUT'
+  | 'CHECKIN'
+  | 'CHECKOUT'
+  | 'CREATE_CLIENT'
+  | 'UPDATE_CLIENT'
+  | 'DELETE_CLIENT'
+  | 'ADD_BLACKLIST'
+  | 'REVOKE_BLACKLIST'
+  | 'DELETE_BLACKLIST'
+  | 'CREATE_PARTY'
+  | 'UPDATE_PARTY'
+  | 'DELETE_PARTY'
+  | 'CREATE_USER'
+  | 'UPDATE_USER'
+  | 'DELETE_USER';
+
+export interface AuditLog {
+  id: string;
+  timestamp: string; // ISO string
+  userId: string;
+  userName: string;
+  userRole: UserRole;
+  action: AuditAction;
+  details: string;
+  targetId?: string;
+  targetName?: string;
 }

@@ -6,13 +6,15 @@
 CREATE DATABASE IF NOT EXISTS `fourdisco` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE `fourdisco`;
 
--- 1. Tabela de Operadores e Administradores
+-- 1. Tabela de Usuários do Sistema (Portaria e Administrador)
 CREATE TABLE IF NOT EXISTS `users` (
   `id` INT AUTO_INCREMENT PRIMARY KEY,
   `username` VARCHAR(50) NOT NULL UNIQUE,
   `password` VARCHAR(255) NOT NULL,
   `name` VARCHAR(100) NOT NULL,
-  `role` ENUM('operator', 'admin') NOT NULL DEFAULT 'operator',
+  `role` ENUM('portaria', 'administrador') NOT NULL DEFAULT 'portaria',
+  `active` BOOLEAN DEFAULT TRUE,
+  `last_login` DATETIME NULL,
   `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -94,13 +96,27 @@ CREATE TABLE IF NOT EXISTS `checkins` (
   FOREIGN KEY (`client_id`) REFERENCES `clients`(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- 6. Tabela de Auditoria do Sistema (Gravação de Todas as Ações)
+CREATE TABLE IF NOT EXISTS `audit_logs` (
+  `id` VARCHAR(50) PRIMARY KEY,
+  `timestamp` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `user_id` VARCHAR(50) NOT NULL,
+  `user_name` VARCHAR(100) NOT NULL,
+  `user_role` ENUM('portaria', 'administrador') NOT NULL,
+  `action` VARCHAR(50) NOT NULL,
+  `details` TEXT NOT NULL,
+  `target_id` VARCHAR(50) NULL,
+  `target_name` VARCHAR(150) NULL,
+  INDEX `idx_audit_timestamp` (`timestamp`),
+  INDEX `idx_audit_user` (`user_id`),
+  INDEX `idx_audit_action` (`action`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- ================================================================
 -- DADOS BÁSICOS DE ACESSO INICIAL
 -- ================================================================
 
--- Usuário padrão do sistema
+-- Usuário Padrão Oficial do Sistema
 INSERT INTO `users` (`username`, `password`, `name`, `role`) VALUES
-('GOUP', 'GOUP226457', 'Administrador FourDisco', 'admin')
+('GOUP', 'GOUP226457', 'Administrador FourDisco', 'administrador')
 ON DUPLICATE KEY UPDATE `password`=VALUES(`password`), `name`=VALUES(`name`), `role`=VALUES(`role`);
-
-
