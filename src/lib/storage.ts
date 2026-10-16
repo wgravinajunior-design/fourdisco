@@ -2,12 +2,12 @@ import { Party, Client, BlacklistEntry, CheckInRecord, BlacklistCheckResult, Use
 import { cleanDocument } from './ocr';
 
 const STORAGE_KEYS = {
-  USER: 'fourdisco_v2_auth_user',
-  PARTIES: 'fourdisco_v2_parties',
-  CLIENTS: 'fourdisco_v2_clients',
-  BLACKLIST: 'fourdisco_v2_blacklist',
-  CHECKINS: 'fourdisco_v2_checkins',
-  SELECTED_PARTY_IDS: 'fourdisco_v2_selected_parties',
+  USER: 'fourdisco_v3_auth_user',
+  PARTIES: 'fourdisco_v3_parties',
+  CLIENTS: 'fourdisco_v3_clients',
+  BLACKLIST: 'fourdisco_v3_blacklist',
+  CHECKINS: 'fourdisco_v3_checkins',
+  SELECTED_PARTY_IDS: 'fourdisco_v3_selected_parties',
 };
 
 // Today's date string YYYY-MM-DD
@@ -19,21 +19,9 @@ export function getTodayString(): string {
   return `${year}-${month}-${day}`;
 }
 
-// Clean initial data (zero fake clients / zero fake checkins / zero fake blacklist)
+// 100% clean initial data (ZERO test data)
 function getDefaultParties(): Party[] {
-  const today = getTodayString();
-  return [
-    {
-      id: 'party-1',
-      name: 'FourDisco Nightclub - Noite Oficial',
-      date: today,
-      description: 'Evento Oficial FourDisco com recepção e portaria ativa',
-      themeColor: '#8b5cf6',
-      maxCapacity: 500,
-      status: 'active',
-      createdAt: new Date().toISOString(),
-    },
-  ];
+  return [];
 }
 
 function getDefaultClients(): Client[] {
@@ -81,13 +69,7 @@ class DataStore {
 
   // Parties
   getParties(): Party[] {
-    const list = this.getItem<Party[]>(STORAGE_KEYS.PARTIES, []);
-    if (!list || list.length === 0) {
-      const defaults = getDefaultParties();
-      this.setItem(STORAGE_KEYS.PARTIES, defaults);
-      return defaults;
-    }
-    return list;
+    return this.getItem<Party[]>(STORAGE_KEYS.PARTIES, getDefaultParties());
   }
 
   getTodayParties(): Party[] {

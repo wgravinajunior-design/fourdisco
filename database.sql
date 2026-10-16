@@ -98,9 +98,9 @@ CREATE TABLE IF NOT EXISTS `checkins` (
 -- DADOS BÁSICOS DE ACESSO INICIAL
 -- ================================================================
 
--- Usuários operacionais padrão
+-- Usuário padrão do sistema
 INSERT INTO `users` (`username`, `password`, `name`, `role`) VALUES
-('operador', '123456', 'Portaria Principal', 'operator'),
-('admin', 'admin123', 'Gerência Geral', 'admin')
-ON DUPLICATE KEY UPDATE `name`=VALUES(`name`);
+('GOUP', 'GOUP226457', 'Administrador FourDisco', 'admin')
+ON DUPLICATE KEY UPDATE `password`=VALUES(`password`), `name`=VALUES(`name`), `role`=VALUES(`role`);
+
 
