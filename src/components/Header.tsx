@@ -68,11 +68,14 @@ export const Header: React.FC<HeaderProps> = ({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
           {/* Logo & Brand */}
-          <div className="flex items-center gap-4">
-            <div className="relative flex items-center justify-center w-12 h-12 rounded-2xl bg-gradient-to-tr from-purple-600 via-pink-600 to-amber-400 p-[2px] shadow-lg shadow-purple-900/40">
-              <div className="w-full h-full bg-[#0d0c18] rounded-[14px] flex items-center justify-center">
-                <Sparkles className="w-6 h-6 text-pink-400 animate-pulse" />
-              </div>
+          <div className="flex items-center gap-3.5">
+            <div className="relative flex items-center justify-center w-12 h-12 rounded-2xl bg-white/5 border border-purple-500/40 p-2 shadow-lg shadow-purple-900/40 overflow-hidden hover:scale-105 transition-transform cursor-pointer">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/logo.png"
+                alt="FOUR"
+                className="w-full h-full object-contain brightness-0 invert drop-shadow-[0_0_12px_rgba(168,85,247,0.7)]"
+              />
             </div>
             <div>
               <div className="flex items-center gap-2">

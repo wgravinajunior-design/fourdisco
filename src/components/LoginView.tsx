@@ -64,11 +64,14 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLogin }) => {
 
       <div className="w-full max-w-md relative z-10 flex flex-col items-center">
         {/* Brand Logo & Heading */}
-        <div className="text-center mb-6">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-3xl bg-gradient-to-tr from-purple-600 via-pink-600 to-amber-400 p-[2px] shadow-2xl shadow-purple-900/60 mb-3 animate-bounce">
-            <div className="w-full h-full bg-[#0d0c18] rounded-[22px] flex items-center justify-center">
-              <Sparkles className="w-8 h-8 text-pink-400" />
-            </div>
+        <div className="text-center mb-6 flex flex-col items-center">
+          <div className="relative mb-2 flex items-center justify-center">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/logo.png"
+              alt="FOUR DISCO"
+              className="w-28 h-28 object-contain brightness-0 invert drop-shadow-[0_0_30px_rgba(168,85,247,0.7)] hover:scale-105 transition-transform"
+            />
           </div>
           <h1 className="text-3xl sm:text-4xl font-black tracking-wider bg-gradient-to-r from-purple-400 via-pink-400 to-amber-300 bg-clip-text text-transparent">
             FOURDISCO
